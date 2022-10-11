@@ -15,7 +15,6 @@ from datetime import timedelta
 from pathlib import Path
 
 import markdown
-import requests
 from markdown.extensions import codehilite
 from pyquery import PyQuery
 from werobot import WeRoBot
@@ -24,9 +23,10 @@ CACHE = {}
 
 CACHE_STORE = "cache.bin"
 
-WECHAT_APP_ID = 'wxe3eda6aaf4430c8b'
-WECHAT_APP_SECRET = '9f1a17b6b55e11e02d3beb3abc31e77e'
 
+
+# WECHAT_APP_ID =os.getenv('WECHAT_APP_ID')
+# WECHAT_APP_SECRET = os.getenv('WECHAT_APP_SECRET')
 
 def dump_cache():
     fp = open(CACHE_STORE, "wb")
@@ -51,8 +51,8 @@ class NewClient:
 
     def __real_get_access_token(self):
         post_url = ("https://api.weixin.qq.com/cgi-bin/token?grant_type="
-                   "client_credential&appid=%s&secret=%s" % (
-                       os.getenv('WECHAT_APP_ID'), os.getenv('WECHAT_APP_SECRET')))
+                    "client_credential&appid=%s&secret=%s" % (
+                        WECHAT_APP_ID, WECHAT_APP_SECRET))
         url_resp = urllib.request.urlopen(post_url)
         url_resp = json.loads(url_resp.read())
         self.__access_token = url_resp['access_token']
@@ -66,8 +66,8 @@ class NewClient:
 
 def client():
     robot = WeRoBot()
-    robot.config["APP_ID"] = os.getenv('WECHAT_APP_ID')
-    robot.config["APP_SECRET"] = os.getenv('WECHAT_APP_SECRET')
+    robot.config["APP_ID"] = WECHAT_APP_ID
+    robot.config["APP_SECRET"] = WECHAT_APP_SECRET
     _client = robot.client
     token = _client.grant_token()
     return _client, token
@@ -271,30 +271,32 @@ def upload_media_news(post_path):
     上传到微信公众号素材
     """
     content = open(post_path, 'r').read()
+    # print(content)
     TITLE = fetch_attr(content, 'title').strip('"').strip('\'')
     gen_cover = fetch_attr(content, 'gen_cover').strip('"')
     images = get_images_from_markdown(content)
-    print(TITLE)
     if len(images) == 0 or gen_cover == "true":
-        images = ['https://source.unsplash.com/random/600x400'] + images
+        # images = ['https://source.unsplash.com/random/600x400'] + images
+        images = ['img/digest-header.png'] + images
+    print(images)
     uploaded_images = {}
     for image in images:
-        media_id = ''
-        media_url = ''
         if image.startswith("http"):
             media_id, media_url = upload_image(image)
         else:
-            media_id, media_url = upload_image_from_path("./blog-source/source" + image)
+            media_id, media_url = upload_image_from_path("./_posts/" + image)
         uploaded_images[image] = [media_id, media_url]
 
     content = update_images_urls(content, uploaded_images)
 
     THUMB_MEDIA_ID = (len(images) > 0 and uploaded_images[images[0]][0]) or ''
-    AUTHOR = 'yukang'
+    AUTHOR = 'GeekCode Genius'
     RESULT = render_markdown(content)
+
     link = os.path.basename(post_path).replace('.md', '')
     digest = fetch_attr(content, 'subtitle').strip().strip('"').strip('\'')
     CONTENT_SOURCE_URL = 'https://catcoding.me/p/{}'.format(link)
+    """
 
     articles = {
         'articles':
@@ -328,13 +330,14 @@ def upload_media_news(post_path):
     media_id = resp['media_id']
     cache_update(post_path)
     return resp
+    """
 
 
 def run(string_date):
     # string_date = "2022-02-04"
-    print(string_date)
+    # print(string_date)
     # path_list = Path("./blog-source/source/_posts").glob('**/*.md')
-    path_list = Path("/Users/wangtai/code/geekcode-digest/_posts").glob('**/*.md')
+    path_list = Path("./_posts").glob('**/*.md')
     for path in path_list:
         path_str = str(path)
         if file_processed(path_str):
@@ -343,10 +346,10 @@ def run(string_date):
         print(path_str)
         content = open(path_str, 'r').read()
         date = fetch_attr(content, 'date').strip()
-        print(date)
+        # print(date)
         if string_date in date:
-            print(path_str)
-        #     news_json = upload_media_news(path_str)
+            # print(path_str)
+            news_json = upload_media_news(path_str)
         #     print(news_json)
         #     print('successful')
 
@@ -358,7 +361,7 @@ if __name__ == '__main__':
     for x in times:
         print("start time: {}".format(x.strftime("%m/%d/%Y, %H:%M:%S")))
         string_date = x.strftime('%Y-%m-%d')
-        print(string_date)
+        # print(string_date)
         run(string_date)
     end_time = time.time()  # 结束时间
     print("程序耗时%f秒." % (end_time - start_time))

@@ -1,4 +1,12 @@
-# GeekCode Digest 033
+title: GeekCode Digest 033
+date: 2022-10-10
+gen_cover: true
+subtitle: Discord 的十亿级别消息索引是如何建立的; 我的第一段真实Rust 代码; 使用Rust 和 MongoDB 创建 RESTful API
+---
+
+GeekCode Digest 033
+---
+
 
 > * Discord 的十亿级别消息索引是如何建立的
 > * https://sukhadanand.medium.com/how-discord-indexes-billions-of-messages-f242e605e47c
@@ -11,10 +19,10 @@
 > * 使用Rust 和 MongoDB 创建 RESTful API
 > * https://blog.devgenius.io/build-a-rest-api-with-rust-and-mongodb-actix-web-version-a275215c262a
 
------
+
 扫描二维码，添加 GeekCode 小助手，加入 GeekCode Community 
 
-![](https://files.mdnice.com/user/9025/feec15c7-627d-459e-95e9-27bb0932c596.png)
+![](img/genius-qrcode.png)
 
-------
+
 点击【阅读原文】访问 GeekCode
