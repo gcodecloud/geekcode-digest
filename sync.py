@@ -14,9 +14,9 @@ from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
 
-import markdown
+import markdown2
 import requests
-from markdown.extensions import codehilite
+# from markdown.extensions import codehilite
 from pyquery import PyQuery
 from werobot import WeRoBot
 
@@ -24,12 +24,9 @@ CACHE = {}
 
 CACHE_STORE = "cache.bin"
 
-WECHAT_APP_ID = 'wxe3eda6aaf4430c8b'
-WECHAT_APP_SECRET = '9f1a17b6b55e11e02d3beb3abc31e77e'
+WECHAT_APP_ID = os.getenv('WECHAT_APP_ID')
+WECHAT_APP_SECRET = os.getenv('WECHAT_APP_SECRET')
 
-
-# WECHAT_APP_ID =os.getenv('WECHAT_APP_ID')
-# WECHAT_APP_SECRET = os.getenv('WECHAT_APP_SECRET')
 
 def dump_cache():
     fp = open(CACHE_STORE, "wb")
@@ -158,17 +155,19 @@ def fetch_attr(content, key):
 
 
 def render_markdown(content):
-    exts = ['markdown.extensions.extra',
-            'markdown.extensions.tables',
-            'markdown.extensions.toc',
-            'markdown.extensions.sane_lists',
-            codehilite.makeExtension(
-                guess_lang=False,
-                noclasses=True,
-                pygments_style='monokai'
-            ), ]
+    # exts = ['markdown.extensions.extra',
+    #         'markdown.extensions.tables',
+    #         'markdown.extensions.toc',
+    #         'markdown.extensions.sane_lists',
+    #         codehilite.makeExtension(
+    #             guess_lang=False,
+    #             noclasses=True,
+    #             pygments_style='monokai'
+    #         ), ]
     post = "".join(content.split("---\n")[2:])
-    html = markdown.markdown(post, extensions=exts)
+    # print(post)
+    # html = markdown2.markdown(post, extensions=exts)
+    html = markdown2.markdown(post)
     open("origi.html", "w").write(html)
     return css_beautify(html)
 
@@ -249,10 +248,10 @@ def fix_image(content):
 
 
 def format_fix(content):
-    content = content.replace("<ul>\n<li>", "<ul><li>")
-    content = content.replace("</li>\n</ul>", "</li></ul>")
-    content = content.replace("<ol>\n<li>", "<ol><li>")
-    content = content.replace("</li>\n</ol>", "</li></ol>")
+    # content = content.replace("<ul>\n<li>", "<ul><li>")
+    # content = content.replace("</li>\n</ul>", "</li></ul>")
+    # content = content.replace("<ol>\n<li>", "<ol><li>")
+    # content = content.replace("</li>\n</ol>", "</li></ol>")
     content = content.replace("background: #272822", gen_css("code"))
     content = content.replace("""<pre style="line-height: 125%">""",
                               """<pre style="line-height: 125%; color: white; font-size: 11px;">""")
@@ -265,7 +264,9 @@ def css_beautify(content):
     content = replace_links(content)
     content = format_fix(content)
     content = fix_image(content)
-    content = gen_css("header") + content + "</section>"
+    content = '<body>' + gen_css("header") + content + "</section></body>"
+    css = open('assets/theme.css', 'r').read()
+    content = '<head><style>\n' + css + '\n</style></head>\n' + content
     return content
 
 
@@ -274,7 +275,6 @@ def upload_media_news(post_path):
     上传到微信公众号素材
     """
     content = open(post_path, 'r').read()
-    # print(content)
     TITLE = fetch_attr(content, 'title').strip('"').strip('\'')
     gen_cover = fetch_attr(content, 'gen_cover').strip('"')
     images = get_images_from_markdown(content)
@@ -296,7 +296,6 @@ def upload_media_news(post_path):
     AUTHOR = 'GeekCode Genius'
     RESULT = render_markdown(content)
 
-    # link = os.path.basename(post_path).replace('.md', '')
     digest = fetch_attr(content, 'subtitle').strip().strip('"').strip('\'')
     CONTENT_SOURCE_URL = 'https://github.com/gcodecloud/geekcode-digest/blob/main/{}'.format(post_path)
 
@@ -320,7 +319,6 @@ def upload_media_news(post_path):
     fp.write(RESULT)
     fp.close()
 
-
     _client = NewClient()
     token = _client.get_access_token()
     headers = {'Content-type': 'text/plain; charset=utf-8'}
@@ -330,7 +328,7 @@ def upload_media_news(post_path):
     r = requests.post(post_url, data=datas, headers=headers)
     resp = json.loads(r.text)
     print(resp)
-    media_id = resp['media_id']
+    # media_id = resp['media_id']
     cache_update(post_path)
     return resp
 
@@ -352,8 +350,8 @@ def run(string_date):
         if string_date in date:
             # print(path_str)
             news_json = upload_media_news(path_str)
-        #     print(news_json)
-        #     print('successful')
+            print(news_json)
+            print('successful')
 
 
 if __name__ == '__main__':
