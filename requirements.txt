@@ -1,0 +1,5 @@
+markdown==3.4.1
+pyquery==1.4.3
+werobot==1.13.1
+requests==2.28.1
+Pygments==2.13.0
