@@ -15,6 +15,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import markdown
+import requests
 from markdown.extensions import codehilite
 from pyquery import PyQuery
 from werobot import WeRoBot
@@ -23,6 +24,8 @@ CACHE = {}
 
 CACHE_STORE = "cache.bin"
 
+WECHAT_APP_ID = 'wxe3eda6aaf4430c8b'
+WECHAT_APP_SECRET = '9f1a17b6b55e11e02d3beb3abc31e77e'
 
 
 # WECHAT_APP_ID =os.getenv('WECHAT_APP_ID')
@@ -293,10 +296,9 @@ def upload_media_news(post_path):
     AUTHOR = 'GeekCode Genius'
     RESULT = render_markdown(content)
 
-    link = os.path.basename(post_path).replace('.md', '')
+    # link = os.path.basename(post_path).replace('.md', '')
     digest = fetch_attr(content, 'subtitle').strip().strip('"').strip('\'')
-    CONTENT_SOURCE_URL = 'https://catcoding.me/p/{}'.format(link)
-    """
+    CONTENT_SOURCE_URL = 'https://github.com/gcodecloud/geekcode-digest/blob/main/{}'.format(post_path)
 
     articles = {
         'articles':
@@ -318,6 +320,7 @@ def upload_media_news(post_path):
     fp.write(RESULT)
     fp.close()
 
+
     _client = NewClient()
     token = _client.get_access_token()
     headers = {'Content-type': 'text/plain; charset=utf-8'}
@@ -330,7 +333,6 @@ def upload_media_news(post_path):
     media_id = resp['media_id']
     cache_update(post_path)
     return resp
-    """
 
 
 def run(string_date):
