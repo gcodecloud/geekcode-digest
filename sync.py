@@ -215,9 +215,10 @@ def upload_media_news(post_path):
     TITLE = fetch_attr(content, 'title').strip('"').strip('\'')
     gen_cover = fetch_attr(content, 'gen_cover').strip('"')
     images = get_images_from_markdown(content)
-    if len(images) == 0 or len(gen_cover) > 0:
-        # images = ['https://source.unsplash.com/random/600x400'] + images
+    if len(gen_cover) > 0:
         images = [gen_cover] + images
+    elif len(images) == 0:
+        images = ['https://source.unsplash.com/random/600x400'] + images
     print(images)
     uploaded_images = {}
     for image in images:
@@ -275,15 +276,17 @@ def upload_draft(articles):
 
 
 def run(string_date):
-    # path_list = Path("./blog-source/source/_posts").glob('**/*.md')
     path_list = Path("./_posts").glob('**/*.md')
     for path in path_list:
         path_str = str(path)
         if file_processed(path_str):
             print("{} has been processed".format(path_str))
-            # continue
+            continue
         content = open(path_str, 'r').read()
         date = fetch_attr(content, 'date').strip()
+        print(1)
+        print(date)
+        print(string_date)
         if string_date in date:
             news_json = upload_media_news(path_str)
             print(news_json)
@@ -293,7 +296,7 @@ def run(string_date):
 if __name__ == '__main__':
     init_cache()
     start_time = time.time()  # 开始时间
-    times = [datetime.now(), datetime.now() - timedelta(days=1)]
+    times = [datetime.now(), datetime.now() - timedelta(days=0)]
     for x in times:
         print("start time: {}".format(x.strftime("%m/%d/%Y, %H:%M:%S")))
         string_date = x.strftime('%Y-%m-%d')
