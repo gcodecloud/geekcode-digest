@@ -1,6 +1,6 @@
 title: GeekCode Digest 033
 date: 2022-10-10
-gen_cover: true
+gen_cover: img/digest-header.png
 subtitle: Discord 的十亿级别消息索引是如何建立的; 我的第一段真实Rust 代码; 使用Rust 和 MongoDB 创建 RESTful API
 ---
 

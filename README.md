@@ -14,7 +14,7 @@ vim new-post.md
 ```markdown
 title: GeekCode Digest 034
 date: 2022-10-11
-gen_cover: true
+gen_cover: img/digest-header.png
 subtitle: 从菜鸟到天才：优化之路，重构 checksum，100倍提升; 为什么技术债是有必要的; 使用AWS CodePipeline和Elastic
 Beanstalk部署GPT-3 Flask 应用程序
 ---

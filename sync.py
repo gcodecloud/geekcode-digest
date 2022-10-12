@@ -215,9 +215,9 @@ def upload_media_news(post_path):
     TITLE = fetch_attr(content, 'title').strip('"').strip('\'')
     gen_cover = fetch_attr(content, 'gen_cover').strip('"')
     images = get_images_from_markdown(content)
-    if len(images) == 0 or gen_cover == "true":
+    if len(images) == 0 or len(gen_cover) > 0:
         # images = ['https://source.unsplash.com/random/600x400'] + images
-        images = ['img/digest-header.png'] + images
+        images = [gen_cover] + images
     print(images)
     uploaded_images = {}
     for image in images:
@@ -275,7 +275,6 @@ def upload_draft(articles):
 
 
 def run(string_date):
-    # string_date = "2022-02-04"
     # path_list = Path("./blog-source/source/_posts").glob('**/*.md')
     path_list = Path("./_posts").glob('**/*.md')
     for path in path_list:
