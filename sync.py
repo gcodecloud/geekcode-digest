@@ -13,6 +13,7 @@ import urllib
 import urllib.request
 from datetime import datetime
 from datetime import timedelta
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 
 import markdown2
@@ -295,6 +296,12 @@ def run(string_date):
             print('successful')
 
 
+def serve(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
+    server_address = ('0.0.0.0', 80)
+    httpd = server_class(server_address, handler_class)
+    httpd.serve_forever()
+
+
 if __name__ == '__main__':
     init_cache()
     start_time = time.time()  # 开始时间
@@ -306,4 +313,4 @@ if __name__ == '__main__':
         run(string_date)
     end_time = time.time()  # 结束时间
     print("程序耗时%f秒." % (end_time - start_time))
-    input("Press enter to exit ;)")
+    serve()
