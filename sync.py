@@ -43,34 +43,36 @@ def init_cache():
 
 
 class NewClient:
+    __access_token = ''
+    __left_time = 0
+    __client: WeRoBot.client
 
-    def __init__(self):
-        self.__access_token = ''
-        self.__left_time = 0
+    @classmethod
+    def __token(cls):
+        robot = WeRoBot()
+        robot.config["APP_ID"] = WECHAT_APP_ID
+        robot.config["APP_SECRET"] = WECHAT_APP_SECRET
+        cls.__client = robot.client
+        token = cls.__client.grant_token()
+        return token
 
-    def __real_get_access_token(self):
-        post_url = ("https://api.weixin.qq.com/cgi-bin/token?grant_type="
-                    "client_credential&appid=%s&secret=%s" % (
-                        WECHAT_APP_ID, WECHAT_APP_SECRET))
-        url_resp = urllib.request.urlopen(post_url)
-        url_resp = json.loads(url_resp.read())
-        print(url_resp)
-        self.__access_token = url_resp['access_token']
-        self.__left_time = url_resp['expires_in']
+    @classmethod
+    def __real_get_access_token(cls):
+        token = cls.__token()
+        cls.__access_token = token['access_token']
+        cls.__left_time = token['expires_in']
 
-    def get_access_token(self):
-        if self.__left_time < 10:
-            self.__real_get_access_token()
-        return self.__access_token
+    @classmethod
+    def get_access_token(cls):
+        if cls.__left_time < 10:
+            cls.__real_get_access_token()
+        return cls.__access_token
 
-
-def client():
-    robot = WeRoBot()
-    robot.config["APP_ID"] = WECHAT_APP_ID
-    robot.config["APP_SECRET"] = WECHAT_APP_SECRET
-    _client = robot.client
-    token = _client.grant_token()
-    return _client, token
+    @classmethod
+    def client(cls):
+        if cls.__left_time < 10:
+            cls.__real_get_access_token()
+        return cls.__client
 
 
 def cache_get(key):
@@ -105,7 +107,7 @@ def upload_image_from_path(image_path):
     res = cache_get(image_digest)
     if res is not None:
         return res[0], res[1]
-    _client, _ = client()
+    _client = NewClient.client()
     media_json = _client.upload_permanent_media("image", open(image_path, "rb"))  ##永久素材
     media_id = media_json['media_id']
     media_url = media_json['url']
