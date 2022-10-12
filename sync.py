@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import pickle
+import re
 import time
 import urllib
 import urllib.request
@@ -16,8 +17,6 @@ from pathlib import Path
 
 import markdown2
 import requests
-# from markdown.extensions import codehilite
-from pyquery import PyQuery
 from werobot import WeRoBot
 
 CACHE = {}
@@ -55,6 +54,7 @@ class NewClient:
                         WECHAT_APP_ID, WECHAT_APP_SECRET))
         url_resp = urllib.request.urlopen(post_url)
         url_resp = json.loads(url_resp.read())
+        print(url_resp)
         self.__access_token = url_resp['access_token']
         self.__left_time = url_resp['expires_in']
 
@@ -155,21 +155,10 @@ def fetch_attr(content, key):
 
 
 def render_markdown(content):
-    # exts = ['markdown.extensions.extra',
-    #         'markdown.extensions.tables',
-    #         'markdown.extensions.toc',
-    #         'markdown.extensions.sane_lists',
-    #         codehilite.makeExtension(
-    #             guess_lang=False,
-    #             noclasses=True,
-    #             pygments_style='monokai'
-    #         ), ]
     post = "".join(content.split("---\n")[2:])
-    # print(post)
-    # html = markdown2.markdown(post, extensions=exts)
     html = markdown2.markdown(post)
     open("origi.html", "w").write(html)
-    return css_beautify(html)
+    return CssContent(html).css_beautify()
 
 
 def update_images_urls(content, uploaded_images):
@@ -181,93 +170,41 @@ def update_images_urls(content, uploaded_images):
     return content
 
 
-def replace_para(content):
-    res = []
-    for line in content.split("\n"):
-        if line.startswith("<p>"):
-            line = line.replace("<p>", gen_css("para"))
-        res.append(line)
-    return "\n".join(res)
+class CssContent(object):
+    def __init__(self, content):
+        self._content = content
 
+    def _get_tag(self, style):
+        return open('./assets/{}.tmpl'.format(style), 'r').read()
 
-def gen_css(path, *args):
-    tmpl = open("./assets/{}.tmpl".format(path), "r").read()
-    return tmpl.format(*args)
+    def _css_section(self):
+        self._content = self._get_tag('section') + self._content + '</section>'
 
+    def _blockquote(self):
+        self._content = self._content.replace('<blockquote>', self._get_tag('blockquote'))
 
-def replace_header(content):
-    res = []
-    for line in content.split("\n"):
-        l = line.strip()
-        if l.startswith("<h") and l.endswith(">") > 0:
-            tag = l.split(' ')[0].replace('<', '')
-            value = l.split('>')[1].split('<')[0]
-            digit = tag[1]
-            font = (18 + (4 - int(tag[1])) * 2) if ('0' <= digit <= '9') else 18
-            res.append(gen_css("sub", tag, font, value, tag))
-        else:
-            res.append(line)
-    return "\n".join(res)
+    def _ul(self):
+        self._content = self._content.replace('<ul>', self._get_tag('ul'))
 
+    def _li(self):
+        self._content = self._content.replace('<li>', self._get_tag('li'))
+        self._content = self._content.replace('</li>', '</section></li>')
 
-def replace_links(content):
-    pq = PyQuery(open('origi.html').read())
-    links = pq('a')
-    refs = []
-    index = 1
-    if len(links) == 0:
-        return content
-    for l in links.items():
-        link = gen_css("link", l.text(), index)
-        index += 1
-        refs.append([l.attr('href'), l.text(), link])
+    def _p(self):
+        self._content = self._content.replace('<p>', self._get_tag('p'))
 
-    for r in refs:
-        orig = "<a href=\"{}\">{}</a>".format(r[0], r[1])
-        content = content.replace(orig, r[2])
-    content = content + "\n" + gen_css("ref_header")
-    content = content + """<section class="footnotes">"""
-    index = 1
-    for r in refs:
-        l = r[2]
-        line = gen_css("ref_link", index, r[1], r[0])
-        index += 1
-        content += line + "\n"
-    content = content + "</section>"
-    return content
+    def _img(self):
+        raw_string = r'{}'.format(self._get_tag('img'))
+        self._content = re.sub(r'<img src="(.*?)" alt="(.*?)" />', raw_string, self._content)
 
-
-def fix_image(content):
-    pq = PyQuery(open('origi.html').read())
-    imgs = pq('img')
-    for line in imgs.items():
-        link = """<img alt="{}" src="{}" />""".format(line.attr('alt'), line.attr('src'))
-        figure = gen_css("figure", link, line.attr('alt'))
-        content = content.replace(link, figure)
-    return content
-
-
-def format_fix(content):
-    # content = content.replace("<ul>\n<li>", "<ul><li>")
-    # content = content.replace("</li>\n</ul>", "</li></ul>")
-    # content = content.replace("<ol>\n<li>", "<ol><li>")
-    # content = content.replace("</li>\n</ol>", "</li></ol>")
-    content = content.replace("background: #272822", gen_css("code"))
-    content = content.replace("""<pre style="line-height: 125%">""",
-                              """<pre style="line-height: 125%; color: white; font-size: 11px;">""")
-    return content
-
-
-def css_beautify(content):
-    content = replace_para(content)
-    content = replace_header(content)
-    content = replace_links(content)
-    content = format_fix(content)
-    content = fix_image(content)
-    content = '<body>' + gen_css("header") + content + "</section></body>"
-    css = open('assets/theme.css', 'r').read()
-    content = '<head><style>\n' + css + '\n</style></head>\n' + content
-    return content
+    def css_beautify(self):
+        self._css_section()
+        self._blockquote()
+        self._ul()
+        self._li()
+        self._p()
+        self._img()
+        return self._content
 
 
 def upload_media_news(post_path):
@@ -319,6 +256,12 @@ def upload_media_news(post_path):
     fp.write(RESULT)
     fp.close()
 
+    resp = upload_draft(articles)
+    cache_update(post_path)
+    return resp
+
+
+def upload_draft(articles):
     _client = NewClient()
     token = _client.get_access_token()
     headers = {'Content-type': 'text/plain; charset=utf-8'}
@@ -327,28 +270,22 @@ def upload_media_news(post_path):
     post_url = "https://api.weixin.qq.com/cgi-bin/draft/add?access_token=%s" % token
     r = requests.post(post_url, data=datas, headers=headers)
     resp = json.loads(r.text)
-    print(resp)
     # media_id = resp['media_id']
-    cache_update(post_path)
     return resp
 
 
 def run(string_date):
     # string_date = "2022-02-04"
-    # print(string_date)
     # path_list = Path("./blog-source/source/_posts").glob('**/*.md')
     path_list = Path("./_posts").glob('**/*.md')
     for path in path_list:
         path_str = str(path)
         if file_processed(path_str):
             print("{} has been processed".format(path_str))
-            continue
-        print(path_str)
+            # continue
         content = open(path_str, 'r').read()
         date = fetch_attr(content, 'date').strip()
-        # print(date)
         if string_date in date:
-            # print(path_str)
             news_json = upload_media_news(path_str)
             print(news_json)
             print('successful')
