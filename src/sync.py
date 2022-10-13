@@ -113,7 +113,13 @@ def upload_image_from_path(image_path):
     if res is not None:
         return res[0], res[1]
     _client = NewClient.client()
-    media_json = _client.upload_permanent_media("image", open(image_path, "rb"))  ##永久素材
+    # media_json = _client.upload_permanent_media("image", open(image_path, "rb"))  ##永久素材
+    media_json = requests.post("https://api.weixin.qq.com/cgi-bin/material/add_material",
+                               params={
+                                   "access_token": _client.get_access_token(),
+                                   "type": "image"
+                               },
+                               files={"media": open(image_path, "rb")}).json()
     media_id = media_json['media_id']
     media_url = media_json['url']
     CACHE[image_digest] = [media_id, media_url]
