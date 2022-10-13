@@ -22,7 +22,11 @@ from werobot import WeRoBot
 
 CACHE = {}
 
-CACHE_STORE = "cache.bin"
+CACHE_STORE = "/tmp/cache.bin"
+
+AUTHOR = 'GeekCode Genius'
+
+BLOG_POST_PATH = "../blog/_posts"
 
 WECHAT_APP_ID = os.getenv('WECHAT_APP_ID')
 WECHAT_APP_SECRET = os.getenv('WECHAT_APP_SECRET')
@@ -70,7 +74,7 @@ class NewClient:
         return cls.__access_token
 
     @classmethod
-    def client(cls):
+    def client(cls) -> WeRoBot.client:
         if cls.__left_time < 10:
             cls.__real_get_access_token()
         return cls.__client
@@ -160,7 +164,7 @@ def fetch_attr(content, key):
 def render_markdown(content):
     post = "".join(content.split("---\n")[2:])
     html = markdown2.markdown(post)
-    open("origi.html", "w").write(html)
+    # open("origi.html", "w").write(html)
     return CssContent(html).css_beautify()
 
 
@@ -178,7 +182,7 @@ class CssContent(object):
         self._content = content
 
     def _get_tag(self, style):
-        return open('./assets/{}.tmpl'.format(style), 'r').read()
+        return open('../assets/{}.tmpl'.format(style), 'r').read()
 
     def _css_section(self):
         self._content = self._get_tag('section') + self._content + '</section>'
@@ -228,13 +232,12 @@ def upload_media_news(post_path):
         if image.startswith("http"):
             media_id, media_url = upload_image(image)
         else:
-            media_id, media_url = upload_image_from_path("./_posts/" + image)
+            media_id, media_url = upload_image_from_path(BLOG_POST_PATH + "/" + image)
         uploaded_images[image] = [media_id, media_url]
 
     content = update_images_urls(content, uploaded_images)
 
     THUMB_MEDIA_ID = (len(images) > 0 and uploaded_images[images[0]][0]) or ''
-    AUTHOR = 'GeekCode Genius'
     RESULT = render_markdown(content)
 
     digest = fetch_attr(content, 'subtitle').strip().strip('"').strip('\'')
@@ -256,9 +259,7 @@ def upload_media_news(post_path):
             ]
     }
 
-    fp = open('./result.html', 'w')
-    fp.write(RESULT)
-    fp.close()
+    # open('./result.html', 'w').write(RESULT)
 
     resp = upload_draft(articles)
     cache_update(post_path)
@@ -279,7 +280,7 @@ def upload_draft(articles):
 
 
 def run(string_date):
-    path_list = Path("./_posts").glob('**/*.md')
+    path_list = Path(BLOG_POST_PATH).glob('**/*.md')
     for path in path_list:
         path_str = str(path)
         if file_processed(path_str):
@@ -287,9 +288,6 @@ def run(string_date):
             continue
         content = open(path_str, 'r').read()
         date = fetch_attr(content, 'date').strip()
-        print(1)
-        print(date)
-        print(string_date)
         if string_date in date:
             news_json = upload_media_news(path_str)
             print(news_json)
@@ -305,7 +303,7 @@ def serve(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
 if __name__ == '__main__':
     init_cache()
     start_time = time.time()  # 开始时间
-    times = [datetime.now(), datetime.now() - timedelta(days=0)]
+    times = [datetime.now(), datetime.now() - timedelta(days=1)]
     for x in times:
         print("start time: {}".format(x.strftime("%m/%d/%Y, %H:%M:%S")))
         string_date = x.strftime('%Y-%m-%d')

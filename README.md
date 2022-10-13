@@ -5,7 +5,7 @@ GeekCode 每日更新技术简报
 ## edit markdown post
 
 ```bash
-cd ./_posts
+cd ./blog/_posts
 vim new-post.md
 ```
 
@@ -33,10 +33,10 @@ GeekCode Digest 034
 ```bash
 export WECHAT_APP_ID=your_wechat_app_id
 export WECHAT_APP_SECRET=your_wechat_app_secret
-pip install -r requirements.txt
-python sync.py
+make init
+make start
 ```
 
 ## open wechat draft
 
-![img.png](img.png)
+![img.png](docs/assets/img.png)

@@ -22,9 +22,8 @@ GeekCode Digest 033
 > * https://blog.devgenius.io/build-a-rest-api-with-rust-and-mongodb-actix-web-version-a275215c262a
 
 
-扫描二维码，添加 GeekCode 小助手，加入 GeekCode Community 
+扫描二维码，添加 GeekCode 小助手，加入 GeekCode Community
 
 ![](img/genius-qrcode.png)
-
 
 点击【阅读原文】访问 GeekCode
