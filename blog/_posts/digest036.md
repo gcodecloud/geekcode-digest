@@ -1,8 +1,7 @@
 title: GeekCode Digest 036
 date: 2022-10-13
 gen_cover: img/digest-header.png
-subtitle: 微软告别C和C++，Rust才是编程语言的未来;Springboot中的多环境开发 ; Kubernetes: Deployments, Services and
-Ingresses
+subtitle: SurrealDB 内部设计; WebAssembly如何使用：使用Wasm建造的18家最令人兴奋的初创公司; Alacritty: 最快的 Terminal
 ---
 
 GeekCode Digest 036
