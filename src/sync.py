@@ -309,7 +309,7 @@ def serve(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
 if __name__ == '__main__':
     init_cache()
     start_time = time.time()  # 开始时间
-    times = [datetime.now(), datetime.now() - timedelta(days=1)]
+    times = [datetime.now(), datetime.now() - timedelta(days=0)]
     for x in times:
         print("start time: {}".format(x.strftime("%m/%d/%Y, %H:%M:%S")))
         string_date = x.strftime('%Y-%m-%d')
