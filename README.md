@@ -37,6 +37,13 @@ make init
 make start
 ```
 
+OR Docker
+
+```bash
+docker build -t geekcode-digest .
+docker run -e WECHAT_APP_ID=your_wechat_app_id -e WECHAT_APP_SECRET=your_wechat_app_secret  geekcode-digest:latest
+```
+
 ## open wechat draft
 
 ![img.png](docs/assets/img.png)
