@@ -3,6 +3,7 @@
 """
 docstring
 """
+from datetime import datetime
 from pprint import pprint
 
 from notion_client import Client
@@ -31,7 +32,7 @@ def get_digest_md_data():
             "filter": {
                 "property": "publish date",
                 "date": {
-                    "equals": "2022-10-14",
+                    "equals": datetime.now().strftime('%Y-%m-%d'),
                 },
             },
         }
