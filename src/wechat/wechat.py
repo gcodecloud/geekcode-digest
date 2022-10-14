@@ -174,7 +174,7 @@ def upload_media_news(post_path):
                     "title": TITLE,
                     "thumb_media_id": THUMB_MEDIA_ID,
                     "author": AUTHOR,
-                    "digest": digest,
+                    "digest": digest[:120],
                     "show_cover_pic": 1,
                     "content": RESULT,
                     "content_source_url": CONTENT_SOURCE_URL
