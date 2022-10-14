@@ -7,6 +7,7 @@ from pprint import pprint
 
 from notion_client import Client
 
+from markdown.markdown import generate_md
 from settings import NOTION_TOKEN, NOTION_DATABASE_ID
 
 
@@ -22,7 +23,7 @@ class NotionLoader:
         return cls.__notion
 
 
-def get_digest_raw_data():
+def get_digest_md_data():
     notion = NotionLoader.load()
     my_page = notion.databases.query(
         **{
@@ -58,4 +59,5 @@ def get_digest_raw_data():
 
 
 if __name__ == '__main__':
-    get_digest_raw_data()
+    md_data = get_digest_md_data()
+    generate_md(md_data)

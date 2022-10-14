@@ -1,7 +1,7 @@
 title: {title}
 date: {date}
 gen_cover: img/digest-header.png
-subtitle: {desc}
+subtitle: {subtitle}
 ---
 {title}
 ---

@@ -16,15 +16,13 @@ import requests
 from werobot import WeRoBot
 
 from markdown.markdown import fetch_attr, get_images_from_markdown, update_images_urls, render_markdown
-from settings import WECHAT_APP_ID, WECHAT_APP_SECRET
+from settings import WECHAT_APP_ID, WECHAT_APP_SECRET, BLOG_POST_DIR
 
 CACHE = {}
 
 CACHE_STORE = "/tmp/cache.bin"
 
 AUTHOR = 'GeekCode Genius'
-
-BLOG_POST_PATH = "../blog/_posts"
 
 
 def dump_cache():
@@ -158,7 +156,7 @@ def upload_media_news(post_path):
         if image.startswith("http"):
             media_id, media_url = upload_image(image)
         else:
-            media_id, media_url = upload_image_from_path(BLOG_POST_PATH + "/" + image)
+            media_id, media_url = upload_image_from_path(BLOG_POST_DIR + image)
         uploaded_images[image] = [media_id, media_url]
 
     content = update_images_urls(content, uploaded_images)
@@ -206,7 +204,7 @@ def upload_draft(articles):
 
 
 def run(string_date):
-    path_list = Path(BLOG_POST_PATH).glob('**/*.md')
+    path_list = Path(BLOG_POST_DIR).glob('**/*.md')
     for path in path_list:
         path_str = str(path)
         if file_processed(path_str):

@@ -4,8 +4,11 @@
 docstring
 """
 import re
+from datetime import datetime
 
 import markdown2
+
+from settings import MD_TEMPLATE_DIR, BLOG_POST_DIR
 
 
 def get_images_from_markdown(content):
@@ -84,5 +87,23 @@ class CssContent(object):
         return self._content
 
 
-def generate_md():
+def generate_md(md_data):
+    digest_item = open(MD_TEMPLATE_DIR + "digest_item.md", 'r').read()
+    content = ''
+    subtitle = ''
+    for item in md_data:
+        content += digest_item.format(**item)
+        subtitle += item['title'] + "; "
+    skeleton = open(MD_TEMPLATE_DIR + "digest_skeleton.md", 'r').read()
+    snum = '#NUM'
+    digest_md = skeleton.format(
+        title='GeekCode Digest ' + snum,
+        date=datetime.now().strftime('%Y-%m-%d'),
+        subtitle=subtitle,
+        digest_item=content
+    )
+
+
+    print(digest_md)
+    open(BLOG_POST_DIR + "digest" + snum + ".md", 'w').write(digest_md)
     pass
