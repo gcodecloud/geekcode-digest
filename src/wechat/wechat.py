@@ -16,7 +16,7 @@ import requests
 from werobot import WeRoBot
 
 from markdown.markdown import fetch_attr, get_images_from_markdown, update_images_urls, render_markdown
-from settings import WECHAT_APP_ID, WECHAT_APP_SECRET, BLOG_POST_DIR
+from settings import WECHAT_APP_ID, WECHAT_APP_SECRET, BLOG_POST_DIR, GIT_BRANCH
 
 CACHE = {}
 
@@ -165,7 +165,7 @@ def upload_media_news(post_path):
     RESULT = render_markdown(content)
 
     digest = fetch_attr(content, 'subtitle').strip().strip('"').strip('\'')
-    CONTENT_SOURCE_URL = 'https://github.com/gcodecloud/geekcode-digest/blob/main/{}'.format(post_path)
+    CONTENT_SOURCE_URL = f'https://github.com/gcodecloud/geekcode-digest/blob/{GIT_BRANCH}/{post_path}'
 
     articles = {
         'articles':
