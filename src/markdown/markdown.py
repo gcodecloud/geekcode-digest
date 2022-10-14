@@ -3,12 +3,17 @@
 """
 docstring
 """
+import glob
+import os.path
+import random
 import re
+import string
 from datetime import datetime
 
+import git
 import markdown2
 
-from settings import MD_TEMPLATE_DIR, BLOG_POST_DIR
+from settings import MD_TEMPLATE_DIR, BLOG_POST_DIR, GIT_URL, GIT_BRANCH
 
 
 def get_images_from_markdown(content):
@@ -95,15 +100,52 @@ def generate_md(md_data):
         content += digest_item.format(**item)
         subtitle += item['title'] + "; "
     skeleton = open(MD_TEMPLATE_DIR + "digest_skeleton.md", 'r').read()
-    snum = '#NUM'
+
+    git_wrapper = GitWrapper()
+    git_wrapper.init_repo()
+    post_path = git_wrapper.work_dir + BLOG_POST_DIR.replace('../', '')
+    snum = get_digest_snum(post_path)
     digest_md = skeleton.format(
-        title='GeekCode Digest ' + snum,
+        title=f'GeekCode Digest {snum}',
         date=datetime.now().strftime('%Y-%m-%d'),
         subtitle=subtitle,
         digest_item=content
     )
-
-
-    print(digest_md)
-    open(BLOG_POST_DIR + "digest" + snum + ".md", 'w').write(digest_md)
+    digest_file_name = f"{post_path}digest{snum}.md"
+    print(digest_file_name)
+    open(digest_file_name, 'w').write(digest_md)
+    git_wrapper.commit(digest_file_name)
     pass
+
+
+def get_digest_snum(post_path):
+    md_list = glob.glob(f'{post_path}/*.md')
+    print(md_list)
+    z = list(map(lambda x: re.findall(r'\d\d\d', x), md_list))
+    z = [int(i[-1]) for i in z if len(i) > 0]
+    max_snum = str(max(z) + 1)
+
+    return max_snum.rjust(3, '0')
+
+
+class GitWrapper:
+    def __init__(self):
+        self._repo = None
+        self.work_dir = ""
+        self._change_file = ""
+
+    def init_repo(self):
+        print("init repo")
+        self.work_dir = '/tmp/geekcode_digest_repo_{}/'.format(''.join(random.choices(string.ascii_letters, k=8)))
+        self._repo = git.Repo.clone_from(GIT_URL, self.work_dir, branch=GIT_BRANCH)
+
+    def commit(self, file_name):
+        print("git commit")
+        self._repo.index.add(file_name)
+        self._repo.index.commit(f"add {os.path.basename(file_name)}")
+        origin = self._repo.remote(name='origin')
+        origin.push()
+
+
+if __name__ == '__main__':
+    print(get_digest_snum(BLOG_POST_DIR))

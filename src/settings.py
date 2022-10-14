@@ -10,3 +10,8 @@ NOTION_DATABASE_ID = 'e5c7b98ea3d84f8f889e4c873d5ea2de'
 # assets location base ./src/
 MD_TEMPLATE_DIR = '../template/markdown/'
 BLOG_POST_DIR = '../blog/_posts/'
+
+GIT_USERNAME = os.getenv('GIT_USERNAME')
+GIT_PASSWORD = os.getenv('GIT_PASSWORD')
+GIT_URL = f'https://{GIT_USERNAME}:{GIT_PASSWORD}@github.com/gcodecloud/geekcode-digest.git'
+GIT_BRANCH = 'new_post_test'

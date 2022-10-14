@@ -53,7 +53,7 @@ def get_digest_md_data():
             'url': _url,
             'desc': _desc
         }]
-    pprint(raw_data)
+    # pprint(raw_data)
 
     return raw_data
 
