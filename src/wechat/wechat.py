@@ -15,7 +15,7 @@ from pathlib import Path
 import requests
 from werobot import WeRoBot
 
-from markdown.tool import fetch_attr, get_images_from_markdown, update_images_urls, render_markdown
+from markdown.markdown import fetch_attr, get_images_from_markdown, update_images_urls, render_markdown
 from settings import WECHAT_APP_ID, WECHAT_APP_SECRET
 
 CACHE = {}

@@ -7,7 +7,7 @@ from pprint import pprint
 
 from notion_client import Client
 
-from settings import NOTION_TOKEN
+from settings import NOTION_TOKEN, NOTION_DATABASE_ID
 
 if __name__ == '__main__':
     notion = Client(auth=NOTION_TOKEN)
@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     my_page = notion.databases.query(
         **{
-            "database_id": "e5c7b98ea3d84f8f889e4c873d5ea2de",
+            "database_id": NOTION_DATABASE_ID,
             "filter": {
                 "property": "publish date",
                 "date": {
