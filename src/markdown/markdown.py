@@ -50,8 +50,9 @@ class CssContent(object):
     def __init__(self, content):
         self._content = content
 
-    def _get_tag(self, style):
-        return open('../assets/{}.tmpl'.format(style), 'r').read()
+    @staticmethod
+    def _get_tag(style):
+        return open('../template/html/{}.tmpl'.format(style), 'r').read()
 
     def _css_section(self):
         self._content = self._get_tag('section') + self._content + '</section>'
@@ -81,3 +82,7 @@ class CssContent(object):
         self._p()
         self._img()
         return self._content
+
+
+def generate_md():
+    pass
