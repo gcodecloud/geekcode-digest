@@ -14,4 +14,4 @@ BLOG_POST_DIR = '../blog/_posts/'
 GIT_USERNAME = os.getenv('GIT_USERNAME')
 GIT_PASSWORD = os.getenv('GIT_PASSWORD')
 GIT_URL = f'https://{GIT_USERNAME}:{GIT_PASSWORD}@github.com/gcodecloud/geekcode-digest.git'
-GIT_BRANCH = 'new_post_test'
+GIT_BRANCH = 'new_post'
