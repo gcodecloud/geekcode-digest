@@ -31,7 +31,7 @@ def push_lark(string_date):
 def main():
     init_cache()
     start_time = time.time()  # 开始时间
-    times = [datetime.now(), datetime.now() - timedelta(days=0)]
+    times = [datetime.now()]
     for x in times:
         print("start time: {}".format(x.strftime("%m/%d/%Y, %H:%M:%S")))
         string_date = x.strftime('%Y-%m-%d')
