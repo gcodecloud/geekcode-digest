@@ -4,6 +4,7 @@
 created: wangtai
 
 """
+
 from markdown.markdown import generate_md
 from notion.notion import get_digest_md_data
 

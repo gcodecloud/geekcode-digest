@@ -15,3 +15,6 @@ GIT_USERNAME = os.getenv('GIT_USERNAME')
 GIT_PASSWORD = os.getenv('GIT_PASSWORD')
 GIT_URL = f'https://{GIT_USERNAME}:{GIT_PASSWORD}@github.com/gcodecloud/geekcode-digest.git'
 GIT_BRANCH = 'new_post'
+
+# Lark group web hook
+LARK_WEB_HOOK = os.getenv('LARK_WEB_HOOK')
