@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * *"
-    - timezone: "Asia/Shanghai"
+ #   - timezone: "Asia/Shanghai"
   # Triggers the workflow on push or pull request events but only for the "main" branch
 #  push:
 #    branches: [ "feature/notion" ]
