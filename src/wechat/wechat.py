@@ -17,6 +17,7 @@ from werobot import WeRoBot
 
 from markdown.markdown import fetch_attr, get_images_from_markdown, update_images_urls, render_markdown
 from settings import WECHAT_APP_ID, WECHAT_APP_SECRET, BLOG_POST_DIR, GIT_BRANCH
+from utils import push_lark
 
 CACHE = {}
 
@@ -216,3 +217,4 @@ def run(string_date):
             news_json = upload_media_news(path_str)
             print(news_json)
             print('successful')
+            push_lark(string_date)
