@@ -10,4 +10,5 @@ from notion.notion import get_digest_md_data
 
 if __name__ == '__main__':
     md_data = get_digest_md_data()
-    generate_md(md_data)
+    if len(md_data) > 0:
+        generate_md(md_data)
