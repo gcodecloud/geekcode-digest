@@ -44,7 +44,7 @@ def get_digest_md_data():
                     {
                         "property": "Status",
                         "select": {
-                            "does_not_equal": "Done",
+                            "equals": "In progress",
                         }
                     },
                 ]
@@ -87,4 +87,6 @@ def mark_done(status_id):
 if __name__ == '__main__':
     md_data = get_digest_md_data()
     pprint(md_data)
+    for item in md_data:
+        mark_done(item['status_id'])
     # generate_md(md_data)
