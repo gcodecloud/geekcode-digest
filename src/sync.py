@@ -23,7 +23,7 @@ def push_lark(string_date):
     requests.post(LARK_WEB_HOOK, headers={'Content-Type': 'application/json'}, json={
         "msg_type": "text",
         "content": {
-            "text": f"推送公众号{string_date}成功"
+            "text": f"推送公众号草稿{string_date}成功"
         }
     })
 
