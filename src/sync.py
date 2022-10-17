@@ -18,7 +18,6 @@ def serve(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
     httpd.serve_forever()
 
 
-
 def main():
     init_cache()
     start_time = time.time()  # 开始时间

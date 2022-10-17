@@ -30,16 +30,31 @@ def get_digest_md_data():
         **{
             "database_id": NOTION_DATABASE_ID,
             "filter": {
-                "property": "publish date",
-                "date": {
-                    "equals": datetime.now().strftime('%Y-%m-%d'),
-                },
+                # "property": "publish date",
+                # "date": {
+                #     "equals": datetime.now().strftime('%Y-%m-%d'),
+                # }
+                "and": [
+                    {
+                        "property": "publish date",
+                        "date": {
+                            "equals": datetime.now().strftime('%Y-%m-%d'),
+                        }
+                    },
+                    {
+                        "property": "Status",
+                        "select": {
+                            "does_not_equal": "Done",
+                        }
+                    },
+                ]
             },
         }
     )
+    pprint(my_page)
     raw_data = []
     for row in my_page['results']:
-        # print(row)
+        # pprint(row)
         _url = row['properties']['url']['url']
         try:
             _desc = row['properties']['desc']['rich_text'][0]['text']['content']
@@ -52,13 +67,24 @@ def get_digest_md_data():
         raw_data += [{
             'title': _title,
             'url': _url,
-            'desc': _desc
+            'desc': _desc,
+            'status_id': row['id']
         }]
-    # pprint(raw_data)
 
     return raw_data
 
 
+def mark_done(status_id):
+    print(status_id)
+    notion = NotionLoader.load()
+    notion.pages.update(page_id=status_id, properties={
+        "Status": {
+            'select': {'name': 'Done'}
+        }
+    })
+
+
 if __name__ == '__main__':
     md_data = get_digest_md_data()
-    generate_md(md_data)
+    pprint(md_data)
+    # generate_md(md_data)
