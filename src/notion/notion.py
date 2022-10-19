@@ -6,22 +6,9 @@ docstring
 from datetime import datetime
 from pprint import pprint
 
-from notion_client import Client
-
-from markdown.markdown import generate_md
-from settings import NOTION_TOKEN, NOTION_DATABASE_ID
-
-
-class NotionLoader:
-    """
-    Notion lazy loader
-    """
-    __notion: Client = None
-
-    @classmethod
-    def load(cls):
-        if cls.__notion is None: cls.__notion = Client(auth=NOTION_TOKEN)
-        return cls.__notion
+from notion.notion_article import get_article
+from notion.notion_loader import NotionLoader
+from settings import NOTION_DATABASE_ID
 
 
 def get_digest_md_data():
@@ -60,15 +47,21 @@ def get_digest_md_data():
             _desc = row['properties']['desc']['rich_text'][0]['text']['content']
         except IndexError:
             _desc = ""
+        _doc = row['properties']['doc'].get('url', '')
+        _doc_content = '' if _doc == '' else get_article(_doc.split('/')[-1])
         try:
             _title = row['properties']['Title']['title'][0]['text']['content']
         except IndexError:
             continue
+        _type = row['properties']['Type']['select']['name']
         raw_data += [{
             'title': _title,
             'url': _url,
             'desc': _desc,
-            'status_id': row['id']
+            'status_id': row['id'],
+            'doc': _doc,
+            'doc_content': _doc_content,
+            'type': _type,
         }]
 
     return raw_data
@@ -82,11 +75,3 @@ def mark_done(status_id):
             'select': {'name': 'Done'}
         }
     })
-
-
-if __name__ == '__main__':
-    md_data = get_digest_md_data()
-    pprint(md_data)
-    for item in md_data:
-        mark_done(item['status_id'])
-    # generate_md(md_data)

@@ -92,30 +92,64 @@ class CssContent(object):
         return self._content
 
 
-def generate_md(md_data):
-    digest_item = open(MD_TEMPLATE_DIR + "digest_item.md", 'r').read()
-    content = ''
-    subtitle = ''
-    for item in md_data:
-        content += digest_item.format(**item)
-        subtitle += item['title'] + "; "
-    skeleton = open(MD_TEMPLATE_DIR + "digest_skeleton.md", 'r').read()
+class MDGenerator(object):
+    def __init__(self, notion_data):
+        self._notion_data = notion_data
+        self._digest_md = ''
+        self._article_md = []
 
-    git_wrapper = GitWrapper()
-    git_wrapper.init_repo()
-    post_path = git_wrapper.work_dir + BLOG_POST_DIR.replace('../', '')
-    snum = get_digest_snum(post_path)
-    digest_md = skeleton.format(
-        title=f'GeekCode Digest {snum}',
-        date=datetime.now().strftime('%Y-%m-%d'),
-        subtitle=subtitle,
-        digest_item=content
-    )
-    digest_file_name = f"{post_path}digest{snum}.md"
-    print(digest_file_name)
-    open(digest_file_name, 'w').write(digest_md)
-    git_wrapper.commit(digest_file_name)
-    pass
+    def generate(self):
+        digest_item = []
+        for item in self._notion_data:
+            if item['type'] == 'digest':
+                digest_item.append(item)
+            elif item['type'] == 'article':
+                self._g_article(item)
+        self._g_digest(digest_item)
+
+    def _g_article(self, article):
+        print(article)
+
+    def _g_digest(self, digest_item):
+        item_md = open(MD_TEMPLATE_DIR + "digest_item.md", 'r').read()
+        content = ''
+        subtitle = ''
+        for item in digest_item:
+            content += item_md.format(**item)
+            subtitle += item['title'] + "; "
+        skeleton = open(MD_TEMPLATE_DIR + "digest_skeleton.md", 'r').read()
+
+        digest_md = skeleton.format(
+            title='GeekCode Digest {snum}',
+            date=datetime.now().strftime('%Y-%m-%d'),
+            subtitle=subtitle,
+            digest_item=content
+        )
+        self._digest_md = digest_md
+
+    def _g_digest1(self, digest_item):
+        item_md = open(MD_TEMPLATE_DIR + "digest_item.md", 'r').read()
+        content = ''
+        subtitle = ''
+        for item in digest_item:
+            content += item_md.format(**item)
+            subtitle += item['title'] + "; "
+        skeleton = open(MD_TEMPLATE_DIR + "digest_skeleton.md", 'r').read()
+
+        git_wrapper = GitWrapper()
+        git_wrapper.init_repo()
+        post_path = git_wrapper.work_dir + BLOG_POST_DIR.replace('../', '')
+        snum = get_digest_snum(post_path)
+        digest_md = skeleton.format(
+            title=f'GeekCode Digest {snum}',
+            date=datetime.now().strftime('%Y-%m-%d'),
+            subtitle=subtitle,
+            digest_item=content
+        )
+        digest_file_name = f"{post_path}digest{snum}.md"
+        print(digest_file_name)
+        open(digest_file_name, 'w').write(digest_md)
+        git_wrapper.commit(digest_file_name)
 
 
 def get_digest_snum(post_path):
